@@ -5,6 +5,7 @@ import { FaEyeSlash } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import SummaryApi from "../common";
 import { toast } from "react-toastify";
+import imageTobase64 from "../helpers/imageTobase64";
 
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -32,14 +33,14 @@ const SignUp = () => {
   const handleUploadPic = async (e) => {
     const file = e.target.files[0];
 
-    // const imagePic = await imageTobase64(file)
+    const imagePic = await imageTobase64(file);
 
-    // setData((preve)=>{
-    //   return{
-    //     ...preve,
-    //     profilePic : imagePic
-    //   }
-    // })
+    setData((preve) => {
+      return {
+        ...preve,
+        profilePic: imagePic,
+      };
+    });
   };
 
   const handleSubmit = async (e) => {
