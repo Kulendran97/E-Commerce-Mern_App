@@ -9,6 +9,7 @@ const SummaryApi = {
     url: `${backendDomin}/api/signin`,
     method: "post",
   },
+
   current_user: {
     url: `${backendDomin}/api/user-details`,
     method: "get",
@@ -24,6 +25,10 @@ const SummaryApi = {
   updateUser: {
     url: `${backendDomin}/api/update-user`,
     method: "post",
+  },
+  current_user: {
+    url: `${backendDomin}/api/user-details`,
+    method: "get",
   },
 };
 
