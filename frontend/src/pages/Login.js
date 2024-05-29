@@ -5,6 +5,7 @@ import { FaEyeSlash } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import SummaryApi from "../common";
+import Context from "../context";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -13,7 +14,7 @@ const Login = () => {
     password: "",
   });
   const navigate = useNavigate();
-
+  const { fetchUserDetails } = useContext(Context);
   const handleOnChange = (e) => {
     const { name, value } = e.target;
 
@@ -26,6 +27,7 @@ const Login = () => {
   };
 
   const handleSubmit = async (e) => {
+    console.log("submitted!");
     e.preventDefault();
 
     const dataResponse = await fetch(SummaryApi.signIn.url, {
@@ -33,7 +35,6 @@ const Login = () => {
       credentials: "include",
       headers: {
         "content-type": "application/json",
-        "Access-Control-Allow-Origin": "*",
       },
       body: JSON.stringify(data),
     });
@@ -41,13 +42,15 @@ const Login = () => {
     const dataApi = await dataResponse.json();
 
     if (dataApi.success) {
+      console.log("login success");
       toast.success(dataApi.message);
       navigate("/");
-      // fetchUserDetails()
+      fetchUserDetails();
       // fetchUserAddToCart()
     }
 
     if (dataApi.error) {
+      console.log("login failed");
       toast.error(dataApi.message);
     }
   };
