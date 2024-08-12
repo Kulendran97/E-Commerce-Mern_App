@@ -4,6 +4,10 @@ import { MdDelete } from "react-icons/md";
 import { CgClose } from "react-icons/cg";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import productCategory from "../helpers/productCategory";
+import uploadImage from "../helpers/uploadImage";
+import DisplayImage from "./DisplayImage";
+import SummaryApi from "../common";
+import { toast } from "react-toastify";
 
 const UploadProduct = ({ onClose, fetchData }) => {
   const [data, setData] = useState({
@@ -27,6 +31,56 @@ const UploadProduct = ({ onClose, fetchData }) => {
         [name]: value,
       };
     });
+  };
+
+  const handleUploadProduct = async (e) => {
+    const file = e.target.files[0];
+    const uploadImageCloudinary = await uploadImage(file);
+
+    setData((preve) => {
+      return {
+        ...preve,
+        productImage: [...preve.productImage, uploadImageCloudinary.url],
+      };
+    });
+  };
+
+  const handleDeleteProductImage = async (index) => {
+    const newProductImage = [...data.productImage];
+    newProductImage.splice(index, 1);
+
+    setData((preve) => {
+      return {
+        ...preve,
+        productImage: [...newProductImage],
+      };
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log("Data:", data)
+
+    const response = await fetch(SummaryApi.uploadProduct.url, {
+      method: SummaryApi.uploadProduct.method,
+      credentials: "include",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    const responseData = await response.json();
+
+    if (responseData.success) {
+      toast.success(responseData?.message);
+      onClose();
+     // fetchData();
+    }
+
+    if (responseData.error) {
+      toast.error(responseData?.message);
+    }
   };
 
   return (
@@ -107,7 +161,7 @@ const UploadProduct = ({ onClose, fetchData }) => {
                     type="file"
                     id="uploadImageInput"
                     className="hidden"
-                    onChange={""}
+                    onChange={handleUploadProduct}
                   />
                 </div>
               </div>
@@ -130,7 +184,7 @@ const UploadProduct = ({ onClose, fetchData }) => {
                           }}
                         />
 
-                        <div className="absolute bottom-0 right-0 p-1 text-white bg-red-600 rounded-full hidden group-hover:block cursor-pointer">
+                        <div className="absolute bottom-0 right-0 p-1 text-white bg-red-600 rounded-full hidden group-hover:block cursor-pointer" onClick={() => handleDeleteProductImage(index)}>
                           <MdDelete />
                         </div>
                       </div>
@@ -184,11 +238,19 @@ const UploadProduct = ({ onClose, fetchData }) => {
               value={data.description}
             ></textarea>
 
-            <button className="px-3 py-2 bg-red-600 text-white mb-10 hover:bg-red-700">
+            <button className="px-3 py-2 bg-red-600 text-white mb-10 hover:bg-red-700" onClick={handleSubmit}>
               Upload Product
             </button>
           </form>
         </div>
+
+        {/* display image full screen */}
+        {openFullScreenImage && (
+          <DisplayImage
+            onClose={() => setOpenFullScreenImage(false)}
+            imgUrl={fullScreenImage}
+          />
+        )}
       </div>
     </div>
   );
